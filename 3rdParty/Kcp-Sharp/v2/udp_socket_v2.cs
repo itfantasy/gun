@@ -62,7 +62,18 @@ namespace KcpProject.v2
         {
             mKcp = new KCP(conv, (byte[] buf, int size) =>
             {
-                mUdpClient.Send(buf, size);
+                try
+                {
+                    mUdpClient.Send(buf, size);
+                }
+                catch (Exception e)
+                {
+                    // itfantasy added
+                    if (this.errHandler != null)
+                    {
+                        this.errHandler.Invoke(e.Message);
+                    }
+                }
             });
 
             // fast mode.
