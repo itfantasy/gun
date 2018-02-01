@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{973478E9-36E5-4F69-9FDC-4A0E9D36005F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>gun</RootNamespace>
+    <AssemblyName>gun</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="3rdParty\Kcp-Sharp\common\kcp.cs" />
+    <Compile Include="3rdParty\Kcp-Sharp\common\switch_queue.cs" />
+    <Compile Include="3rdParty\Kcp-Sharp\v1\udp_socket_v1.cs" />
+    <Compile Include="3rdParty\Kcp-Sharp\v2\udp_socket_v2.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\ByteOrder.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\CloseEventArgs.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\CloseStatusCode.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\CompressionMethod.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\ErrorEventArgs.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Ext.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Fin.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\HttpBase.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\HttpRequest.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\HttpResponse.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\LogData.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Logger.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\LogLevel.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Mask.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\MessageEventArgs.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\AuthenticationBase.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\AuthenticationChallenge.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\AuthenticationResponse.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\AuthenticationSchemes.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\Chunk.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ChunkedRequestStream.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ChunkStream.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ClientSslConfiguration.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\Cookie.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\CookieCollection.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\CookieException.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\EndPointListener.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\EndPointManager.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpBasicIdentity.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpConnection.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpDigestIdentity.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpHeaderInfo.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpHeaderType.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListener.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerAsyncResult.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerContext.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerException.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerPrefix.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerPrefixCollection.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerRequest.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpListenerResponse.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpRequestHeader.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpResponseHeader.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpStatusCode.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpStreamAsyncResult.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpUtility.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\HttpVersion.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\InputChunkState.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\InputState.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\LineState.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\NetworkCredential.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\QueryStringCollection.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ReadBufferState.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\RequestStream.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ResponseStream.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\ServerSslConfiguration.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\SslConfiguration.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\WebHeaderCollection.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\WebSockets\HttpListenerWebSocketContext.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\WebSockets\TcpListenerWebSocketContext.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Net\WebSockets\WebSocketContext.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Opcode.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\PayloadData.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Rsv.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\HttpRequestEventArgs.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\HttpServer.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\IWebSocketSession.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\ServerState.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketBehavior.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketServer.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketServiceHost.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketServiceHost`1.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketServiceManager.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\Server\WebSocketSessionManager.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\WebSocket.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\WebSocketException.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\WebSocketFrame.cs" />
+    <Compile Include="3rdParty\WebSocketSharp\WebSocketState.cs" />
+    <Compile Include="error.cs" />
+    <Compile Include="gnbuffers\GnBuffer.cs" />
+    <Compile Include="gnbuffers\GnParser.cs" />
+    <Compile Include="gnbuffers\GnTypes.cs" />
+    <Compile Include="gnbuffers\NativeFormatter.cs" />
+    <Compile Include="nets\INetEventListener.cs" />
+    <Compile Include="nets\INetWorker.cs" />
+    <Compile Include="nets\kcp\KcpNetWorker.cs" />
+    <Compile Include="nets\tcp\TcpNetWorker.cs" />
+    <Compile Include="nets\ws\WSNetWorker.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="3rdParty\github.com\itfantasy\lmjson\lmjson.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="nets\http\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lmjson\lmjson.csproj">
+      <Project>{a00132b8-bbf9-4976-9f3b-1b411ed044d8}</Project>
+      <Name>lmjson</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
