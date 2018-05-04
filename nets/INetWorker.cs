@@ -12,6 +12,7 @@ namespace itfantasy.gun.nets
         error SendAsync(byte[] msg, Action<bool> callback = null);
 	    error BindEventListener(INetEventListener eventListener);
         void Close();
-        void Update();
+        bool Update();
+        bool Connected { get; }
     }
 }

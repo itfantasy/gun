@@ -41,7 +41,7 @@ namespace itfantasy.gun.nets.tcp
             }, null);
         }
 
-        public void Update()
+        public bool Update()
         {
             if (this.msgQueue.Count > 0)
             {
@@ -51,7 +51,9 @@ namespace itfantasy.gun.nets.tcp
                     e = this.msgQueue.Dequeue();
                 }
                 this.eventListener.OnMsg(e);
+                return true;
             }
+            return false;
         }
 
         public error Send(byte[] msg)
@@ -101,6 +103,14 @@ namespace itfantasy.gun.nets.tcp
             string json = JSON.Stringify(jd);
             byte[] buf = System.Text.Encoding.UTF8.GetBytes(json);
             Send(buf);
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                return tcpsocket != null && tcpsocket.Connected;
+            }
         }
     }
 }

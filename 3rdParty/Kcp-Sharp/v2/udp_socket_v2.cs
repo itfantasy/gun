@@ -165,5 +165,14 @@ namespace KcpProject.v2
                 mNeedUpdateFlag = false;
             }
         }
+
+        // itfantasy added
+        public bool Connected
+        {
+            get
+            {
+                return mUdpClient != null && mKcp != null;
+            }
+        }
     }
 }

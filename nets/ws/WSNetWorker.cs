@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +21,7 @@ namespace itfantasy.gun.nets.ws
             this.msgQueue = new Queue<MessageEventArgs>();
         }
 
-        public void Update()
+        public bool Update()
         {
             if (this.msgQueue.Count > 0)
             {
@@ -29,7 +31,9 @@ namespace itfantasy.gun.nets.ws
                     e = this.msgQueue.Dequeue();
                 }
                 this.eventListener.OnMsg(e.RawData);
+                return true;
             }
+            return false;
         }
 
         public void Connect(string url, string tag)
@@ -106,5 +110,14 @@ namespace itfantasy.gun.nets.ws
         {
             this.eventListener.OnError(errors.New(e.Message));
         }
+
+        public bool Connected
+        {
+            get
+            {
+                return this.websocket != null && this.websocket.IsAlive;
+            }
+        }
     }
 }
+#endif

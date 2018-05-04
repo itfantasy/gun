@@ -30,9 +30,9 @@ namespace itfantasy.gun.nets.kcp
             this.msgQueue = new Queue<byte[]>();
         }
 
-        public void Update()
+        public bool Update()
         {
-            if (this.kcpsocket != null)
+            if (Connected)
             {
                 this.kcpsocket.Update();
             }
@@ -44,7 +44,9 @@ namespace itfantasy.gun.nets.kcp
                     e = this.msgQueue.Dequeue();
                 }
                 this.eventListener.OnMsg(e);
+                return true;
             }
+            return false;
         }
 
         public void Connect(string url, string tag)
@@ -123,6 +125,7 @@ namespace itfantasy.gun.nets.kcp
 
         public void Close()
         {
+            this.eventListener.OnClose();
             this.kcpsocket.Close();
             this.kcpsocket = null;
             this.msgQueue.Clear();
@@ -135,6 +138,14 @@ namespace itfantasy.gun.nets.kcp
             string json = JSON.Stringify(jd);
             byte[] buf = System.Text.Encoding.UTF8.GetBytes(json);
             Send(buf);
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                return this.kcpsocket != null && this.kcpsocket.Connected;
+            }
         }
     }
 

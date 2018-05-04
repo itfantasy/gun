@@ -18,7 +18,22 @@ namespace itfantasy.gun.gnbuffers
 
         public byte Byte()
         {
-            return this.buffer[this.offset++];
+            try
+            {
+                return this.buffer[this.offset++];
+            }
+            catch
+            {
+                int jj = 0;
+                return 0;
+            }
+        }
+
+        public bool Bool()
+        {
+            bool ret = BitConverter.ToBoolean(this.buffer, this.offset);
+            this.offset += 1;
+            return ret;
         }
 
         public short Short()
@@ -108,6 +123,8 @@ namespace itfantasy.gun.gnbuffers
             {
                 case GnTypes.Byte:
                     return this.Byte();
+                case GnTypes.Bool:
+                    return this.Bool();
                 case GnTypes.Short:
                     return this.Short();
                 case GnTypes.Int:
