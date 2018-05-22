@@ -18,15 +18,7 @@ namespace itfantasy.gun.gnbuffers
 
         public byte Byte()
         {
-            try
-            {
-                return this.buffer[this.offset++];
-            }
-            catch
-            {
-                int jj = 0;
-                return 0;
-            }
+            return this.buffer[this.offset++];
         }
 
         public bool Bool()
@@ -141,6 +133,12 @@ namespace itfantasy.gun.gnbuffers
                     return this.Array();
                 case GnTypes.Hash:
                     return this.Hash();
+                case GnTypes.Null:
+                    if(this.Byte() == 0)
+                    {
+                        return null;
+                    }
+                    break;
                 case GnTypes.Native:
                     return this.Native();
                 default:
@@ -161,6 +159,7 @@ namespace itfantasy.gun.gnbuffers
                     }    
                     return null;
             }
+            return null;
         }
 
         public bool OverFlow()

@@ -17,6 +17,7 @@ namespace itfantasy.gun.gnbuffers
         public const byte Array = (byte)'A';
         public const byte Hash = (byte)'H';
         public const byte Bool = (byte)'B';
+        public const byte Null = (byte)'N';
         public const byte Native = (byte)'#';
 
         public static bool ExtendCustomType(Type type, byte bSign, SerializeFunc serializeFunc, DeserializeFunc deserializeFunc)

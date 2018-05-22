@@ -112,95 +112,95 @@ namespace itfantasy.gun.gnbuffers
 
         public void PushObject(object value)
         {
-            try
+
+            if(value == null)
             {
-                Type type = value.GetType();
-                if (type == typeof(byte))
+                this.PushByte(GnTypes.Null);
+                this.PushByte((byte)0);
+                return;
+            }
+            Type type = value.GetType();
+            if (type == typeof(byte))
+            {
+                this.PushByte(GnTypes.Byte);
+                this.PushByte((byte)value);
+            }
+            else if (type == typeof(bool))
+            {
+                this.PushByte(GnTypes.Bool);
+                this.PushBool((bool)value);
+            }
+            else if (type == typeof(short))
+            {
+                this.PushByte(GnTypes.Short);
+                this.PushShort((short)value);
+            }
+            else if (type == typeof(int))
+            {
+                this.PushByte(GnTypes.Int);
+                this.PushInt((int)value);
+            }
+            else if (type == typeof(long))
+            {
+                this.PushByte(GnTypes.Long);
+                this.PushLong((long)value);
+            }
+            else if (type == typeof(string))
+            {
+                this.PushByte(GnTypes.String);
+                this.PushString(value.ToString());
+            }
+            else if (type == typeof(float))
+            {
+                this.PushByte(GnTypes.Float);
+                this.PushFloat((float)value);
+            }
+            else if (value is Array)
+            {
+                if (type == typeof(int[]))
                 {
-                    this.PushByte(GnTypes.Byte);
-                    this.PushByte((byte)value);
-                }
-                else if (type == typeof(bool))
-                {
-                    this.PushByte(GnTypes.Bool);
-                    this.PushBool((bool)value);
-                }
-                else if (type == typeof(short))
-                {
-                    this.PushByte(GnTypes.Short);
-                    this.PushShort((short)value);
-                }
-                else if (type == typeof(int))
-                {
-                    this.PushByte(GnTypes.Int);
-                    this.PushInt((int)value);
-                }
-                else if (type == typeof(long))
-                {
-                    this.PushByte(GnTypes.Long);
-                    this.PushLong((long)value);
-                }
-                else if (type == typeof(string))
-                {
-                    this.PushByte(GnTypes.String);
-                    this.PushString(value.ToString());
-                }
-                else if (type == typeof(float))
-                {
-                    this.PushByte(GnTypes.Float);
-                    this.PushFloat((float)value);
-                }
-                else if (value is Array)
-                {
-                    if (type == typeof(int[]))
-                    {
-                        this.PushByte(GnTypes.Ints);
-                        this.PushInts(value as int[]);
-                    }
-                    else
-                    {
-                        this.PushByte(GnTypes.Array);
-                        this.PushArray(value as Array);
-                    }
-                }
-                else if (value is Dictionary<object, object>)
-                {
-                    this.PushByte(GnTypes.Hash);
-                    this.PushHash(value as Dictionary<object, object>);
-                }
-                else if (value is Dictionary<int, int>)
-                {
-                    this.PushByte(GnTypes.Hash);
-                    this.PushHash(value as Dictionary<int, int>);
+                    this.PushByte(GnTypes.Ints);
+                    this.PushInts(value as int[]);
                 }
                 else
                 {
-                    if (customTypeExtends.ContainsKey(type))
+                    this.PushByte(GnTypes.Array);
+                    this.PushArray(value as Array);
+                }
+            }
+            else if (value is Dictionary<object, object>)
+            {
+                this.PushByte(GnTypes.Hash);
+                this.PushHash(value as Dictionary<object, object>);
+            }
+            else if (value is Dictionary<int, int>)
+            {
+                this.PushByte(GnTypes.Hash);
+                this.PushHash(value as Dictionary<int, int>);
+            }
+            else
+            {
+                if (customTypeExtends.ContainsKey(type))
+                {
+                    CustomType custom = customTypeExtends[type];
+                    this.PushByte(custom.bSign);
+                    if (custom.gnSerializeFunc != null)
                     {
-                        CustomType custom = customTypeExtends[type];
-                        this.PushByte(custom.bSign);
-                        if (custom.gnSerializeFunc != null)
-                        {
-                            custom.gnSerializeFunc(this, value);
-                        }
-                        else
-                        {
-                            byte[] datas = custom.serializeFunc(value);
-                            this.PushInt(datas.Length);
-                            Buffer.BlockCopy(datas, 0, this.buffer, this.offset, datas.Length);
-                            this.offset += datas.Length;
-                        }
+                        custom.gnSerializeFunc(this, value);
                     }
                     else
                     {
-                        this.PushByte(GnTypes.Native);
-                        this.PushNative(value);
+                        byte[] datas = custom.serializeFunc(value);
+                        this.PushInt(datas.Length);
+                        Buffer.BlockCopy(datas, 0, this.buffer, this.offset, datas.Length);
+                        this.offset += datas.Length;
                     }
                 }
-            }
-            catch
-            {
-                int jj = 0;
+                else
+                {
+                    this.PushByte(GnTypes.Native);
+                    this.PushNative(value);
+                }
             }
         }
 
