@@ -70,13 +70,13 @@ namespace itfantasy.gun.nets.kcp
                         this.eventListener.OnClose();
                         break;
                     case KcpProject.v1.UdpSocket.cliEvent.RcvMsg:
-                        this.eventListener.OnMsg(buf);
+                        this.OnReceive(buf);
                         break;
                 }
             });
 #else // KCP_v2
             this.kcpsocket = new KcpProject.v2.UdpSocket((byte[] buf) =>  {
-                this.eventListener.OnMsg(buf);
+                this.OnReceive(buf);
             },(err) => {
                 this.eventListener.OnError(errors.New(err));
             });
@@ -89,11 +89,20 @@ namespace itfantasy.gun.nets.kcp
 #endif
         }
 
-        private void OnKcpReceive(byte[] buffer, int size, IPEndPoint remotePoint)
+        private void OnReceive(byte[] buf)
         {
+            if (buf[0] == 35)
+            {
+                string str = System.Text.Encoding.UTF8.GetString(buf);
+                if (str == "#ping")
+                {
+                    SendAsync(System.Text.Encoding.UTF8.GetBytes("#pong")); // return the pong pck to server
+                    return;
+                }
+            }
             lock (this.msgQueue)
             {
-                this.msgQueue.Enqueue(buffer);
+                this.msgQueue.Enqueue(buf);
             }
         }
 
