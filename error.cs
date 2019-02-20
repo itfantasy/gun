@@ -9,6 +9,16 @@ namespace itfantasy.gun
     {
         private string text;
 
+        public bool nil
+        {
+            get
+            {
+                return text == "nil";
+            }
+        }
+
+        private object token { get; set; }
+
         public error(string text)
         {
             this.text = text;
@@ -18,11 +28,28 @@ namespace itfantasy.gun
         {
             return this.text;
         }
+
+        public T Result<T>()
+        {
+            return (T)this.token;
+        }
+
+        public error AttachResult(object result)
+        {
+            this.token = result;
+            return this;
+        }
     }
 
     public class errors
     {
-        public static error nil = new error("nil");
+        public static error nil
+        {
+            get
+            {
+                return new error("nil");
+            }
+        }
 
         public static error New(string text)
         {
