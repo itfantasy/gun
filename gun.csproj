@@ -131,6 +131,7 @@
     <Compile Include="nets\tcp\TcpNetWorker.cs" />
     <Compile Include="nets\ws\WSNetWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="3rdParty\github.com\itfantasy\lmjson\lmjson.md" />

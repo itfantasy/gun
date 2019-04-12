@@ -49,7 +49,7 @@ namespace itfantasy.gun.nets.kcp
             return false;
         }
 
-        public void Connect(string url, string tag)
+        public void Connect(string url)
         {
             string urlInfo = url.TrimStart(("kcp://").ToCharArray());
             string[] infos = urlInfo.Split(':');
@@ -82,7 +82,7 @@ namespace itfantasy.gun.nets.kcp
             });
 #endif
             this.kcpsocket.Connect(infos[0], ushort.Parse(infos[1]));
-            this.doHandShake("localhost");
+            this.doHandShake("localhost#cnt");
 #if KCP_v1
 #else // KCP_v2
             this.eventListener.OnConn();

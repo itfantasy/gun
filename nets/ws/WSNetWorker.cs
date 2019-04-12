@@ -36,10 +36,10 @@ namespace itfantasy.gun.nets.ws
             return false;
         }
 
-        public void Connect(string url, string tag)
+        public void Connect(string url)
         {
             this.websocket = new WebSocket(url + "/" + tag);
-            this.websocket.Origin = "ws://127.0.0.1/";
+            this.websocket.Origin = "ws://127.0.0.1/#cnt";
             this.websocket.OnOpen += websocket_OnConnect;
             this.websocket.OnMessage += websocket_OnMessage;
             this.websocket.OnClose += websocket_OnClose;

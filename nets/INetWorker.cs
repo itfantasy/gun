@@ -7,7 +7,7 @@ namespace itfantasy.gun.nets
 {
     public interface INetWorker
     {
-	    void Connect(string url, string tag);
+	    void Connect(string url);
         error Send(byte[] msg);
         error SendAsync(byte[] msg, Action<bool> callback = null);
 	    error BindEventListener(INetEventListener eventListener);

@@ -21,7 +21,7 @@ namespace itfantasy.gun
         {
             netWorker = new KcpNetWorker();
             netWorker.BindEventListener(this);
-            netWorker.Connect("kcp://192.168.99.100:8802", "lobby");
+            netWorker.Connect("kcp://192.168.99.100:8802");
             while (true)
             {
                 netWorker.Update();
