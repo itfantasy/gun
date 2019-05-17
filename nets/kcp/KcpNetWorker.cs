@@ -82,7 +82,7 @@ namespace itfantasy.gun.nets.kcp
             });
 #endif
             this.kcpsocket.Connect(infos[0], ushort.Parse(infos[1]));
-            this.doHandShake("localhost#cnt");
+            this.doHandShake("");
 #if KCP_v1
 #else // KCP_v2
             this.eventListener.OnConn();

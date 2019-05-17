@@ -121,10 +121,10 @@
     <Compile Include="3rdParty\WebSocketSharp\WebSocketFrame.cs" />
     <Compile Include="3rdParty\WebSocketSharp\WebSocketState.cs" />
     <Compile Include="error.cs" />
-    <Compile Include="gnbuffers\GnBuffer.cs" />
-    <Compile Include="gnbuffers\GnParser.cs" />
-    <Compile Include="gnbuffers\GnTypes.cs" />
-    <Compile Include="gnbuffers\NativeFormatter.cs" />
+    <Compile Include="core\binbuf\BinBuffer.cs" />
+    <Compile Include="core\binbuf\BinParser.cs" />
+    <Compile Include="core\binbuf\Types.cs" />
+    <Compile Include="core\binbuf\NativeFormatter.cs" />
     <Compile Include="nets\INetEventListener.cs" />
     <Compile Include="nets\INetWorker.cs" />
     <Compile Include="nets\kcp\KcpNetWorker.cs" />

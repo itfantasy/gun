@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace itfantasy.gun.gnbuffers
+namespace itfantasy.gun.core.binbuf
 {
-    public class GnParser
+    public class BinParser
     {
         byte[] buffer;
         int offset;
 
-        public GnParser(byte[] buffer, int offset)
+        public BinParser(byte[] buffer, int offset)
         {
             this.buffer = buffer;
             this.offset = offset;
@@ -113,41 +113,41 @@ namespace itfantasy.gun.gnbuffers
             byte c = this.Byte();
             switch (c)
             {
-                case GnTypes.Byte:
+                case Types.Byte:
                     return this.Byte();
-                case GnTypes.Bool:
+                case Types.Bool:
                     return this.Bool();
-                case GnTypes.Short:
+                case Types.Short:
                     return this.Short();
-                case GnTypes.Int:
+                case Types.Int:
                     return this.Int();
-                case GnTypes.Long:
+                case Types.Long:
                     return this.Long();
-                case GnTypes.String:
+                case Types.String:
                     return this.String();
-                case GnTypes.Float:
+                case Types.Float:
                     return this.Float();
-                case GnTypes.Ints:
+                case Types.Ints:
                     return this.Ints();
-                case GnTypes.Array:
+                case Types.Array:
                     return this.Array();
-                case GnTypes.Hash:
+                case Types.Hash:
                     return this.Hash();
-                case GnTypes.Null:
+                case Types.Null:
                     if(this.Byte() == 0)
                     {
                         return null;
                     }
                     break;
-                case GnTypes.Native:
+                case Types.Native:
                     return this.Native();
                 default:
                     if (customTypeExtends.ContainsKey(c))
                     {
                         CustomType custom = customTypeExtends[c];
-                        if (custom.gnDeserializeFunc != null)
+                        if (custom.binDeserializeFunc != null)
                         {
-                            return custom.gnDeserializeFunc(this);
+                            return custom.binDeserializeFunc(this);
                         }
                         else
                         {
@@ -175,7 +175,7 @@ namespace itfantasy.gun.gnbuffers
             return true;
         }
 
-        public static bool ExtendCustomType(Type type, byte bSign, GnDeserializeFunc func)
+        public static bool ExtendCustomType(Type type, byte bSign, BinDeserializeFunc func)
         {
             customTypeExtends[bSign] = new CustomType(type, bSign, null, func);
             return true;

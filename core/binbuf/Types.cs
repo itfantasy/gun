@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace itfantasy.gun.gnbuffers
+namespace itfantasy.gun.core.binbuf
 {
-    public class GnTypes
+    public class Types
     {
         public const byte Byte = (byte)'b';
         public const byte Short = (byte)'t';
@@ -26,28 +26,28 @@ namespace itfantasy.gun.gnbuffers
             {
                 return false;
             }
-            if (!GnBuffer.ExtendCustomType(type, bSign, serializeFunc))
+            if (!BinBuffer.ExtendCustomType(type, bSign, serializeFunc))
             {
                 return false;
             }
-            if (!GnParser.ExtendCustomType(type, bSign, deserializeFunc))
+            if (!BinParser.ExtendCustomType(type, bSign, deserializeFunc))
             {
                 return false;
             }
             return true;
         }
 
-        public static bool GnExtendCustomType(Type type, byte bSign, GnSerializeFunc serializeFunc, GnDeserializeFunc deserializeFunc)
+        public static bool BinExtendCustomType(Type type, byte bSign, BinSerializeFunc serializeFunc, BinDeserializeFunc deserializeFunc)
         {
             if (!CheckNativeTypes(bSign))
             {
                 return false;
             }
-            if (!GnBuffer.ExtendCustomType(type, bSign, serializeFunc))
+            if (!BinBuffer.ExtendCustomType(type, bSign, serializeFunc))
             {
                 return false;
             }
-            if (!GnParser.ExtendCustomType(type, bSign, deserializeFunc))
+            if (!BinParser.ExtendCustomType(type, bSign, deserializeFunc))
             {
                 return false;
             }
@@ -77,8 +77,8 @@ namespace itfantasy.gun.gnbuffers
     public delegate byte[] SerializeFunc(object obj);
     public delegate object DeserializeFunc(byte[] data);
 
-    public delegate void GnSerializeFunc(GnBuffer buffer, object obj);
-    public delegate object GnDeserializeFunc(GnParser parser);
+    public delegate void BinSerializeFunc(BinBuffer buffer, object obj);
+    public delegate object BinDeserializeFunc(BinParser parser);
 
     public class CustomType
     {
@@ -86,8 +86,8 @@ namespace itfantasy.gun.gnbuffers
         public byte bSign { get; set; }
         public SerializeFunc serializeFunc { get; set; }
         public DeserializeFunc deserializeFunc { get; set; }
-        public GnSerializeFunc gnSerializeFunc { get; set; }
-        public GnDeserializeFunc gnDeserializeFunc { get; set; }
+        public BinSerializeFunc binSerializeFunc { get; set; }
+        public BinDeserializeFunc binDeserializeFunc { get; set; }
 
         public CustomType(Type type, byte bSign, SerializeFunc serializeFunc, DeserializeFunc deserializeFunc)
         {
@@ -97,12 +97,12 @@ namespace itfantasy.gun.gnbuffers
             this.deserializeFunc = deserializeFunc;
         }
 
-        public CustomType(Type type, byte bSign, GnSerializeFunc serializeFunc, GnDeserializeFunc deserializeFunc)
+        public CustomType(Type type, byte bSign, BinSerializeFunc serializeFunc, BinDeserializeFunc deserializeFunc)
         {
             this.type = type;
             this.bSign = bSign;
-            this.gnSerializeFunc = serializeFunc;
-            this.gnDeserializeFunc = deserializeFunc;
+            this.binSerializeFunc = serializeFunc;
+            this.binDeserializeFunc = deserializeFunc;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace itfantasy.gun
         {
             get
             {
-                return text == "nil";
+                return text == String.Empty;
             }
         }
 
@@ -47,7 +47,7 @@ namespace itfantasy.gun
         {
             get
             {
-                return new error("nil");
+                return new error(String.Empty);
             }
         }
 

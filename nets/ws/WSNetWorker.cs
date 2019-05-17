@@ -39,7 +39,7 @@ namespace itfantasy.gun.nets.ws
         public void Connect(string url)
         {
             this.websocket = new WebSocket(url + "/" + tag);
-            this.websocket.Origin = "ws://127.0.0.1/#cnt";
+            this.websocket.Origin = "ws://127.0.0.1/cnt#cnt";
             this.websocket.OnOpen += websocket_OnConnect;
             this.websocket.OnMessage += websocket_OnMessage;
             this.websocket.OnClose += websocket_OnClose;

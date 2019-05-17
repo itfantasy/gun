@@ -9,7 +9,7 @@ using itfantasy.gun.nets.ws;
 #endif
 using itfantasy.gun.nets.kcp;
 using itfantasy.gun.nets.tcp;
-using itfantasy.gun.gnbuffers;
+using itfantasy.gun.core.binbuf;
 
 namespace itfantasy.gun
 {
@@ -36,7 +36,7 @@ namespace itfantasy.gun
             {
                 while (true)
                 {
-                    GnBuffer buf = new GnBuffer(4096);
+                    BinBuffer buf = new BinBuffer(4096);
                     buf.PushInt(666);
                     buf.PushString("almighty brother gang!!");
                     netWorker.Send(buf.Bytes());
@@ -50,7 +50,7 @@ namespace itfantasy.gun
         {
             Console.WriteLine("receive from server!");
             Console.WriteLine(msg.Length);
-            GnParser par = new GnParser(msg, 0);
+            BinParser par = new BinParser(msg, 0);
             Console.WriteLine(par.Int());
             Console.WriteLine(par.String());
         }

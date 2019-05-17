@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace itfantasy.gun.gnbuffers
+namespace itfantasy.gun.core.binbuf
 {
-    public class GnBuffer
+    public class BinBuffer
     {
         byte[] buffer;
         int offset;
 
-        public GnBuffer(int capacity)
+        public BinBuffer(int capacity)
         {
             this.buffer = new byte[capacity];
             this.offset = 0;
@@ -115,67 +115,67 @@ namespace itfantasy.gun.gnbuffers
 
             if(value == null)
             {
-                this.PushByte(GnTypes.Null);
+                this.PushByte(Types.Null);
                 this.PushByte((byte)0);
                 return;
             }
             Type type = value.GetType();
             if (type == typeof(byte))
             {
-                this.PushByte(GnTypes.Byte);
+                this.PushByte(Types.Byte);
                 this.PushByte((byte)value);
             }
             else if (type == typeof(bool))
             {
-                this.PushByte(GnTypes.Bool);
+                this.PushByte(Types.Bool);
                 this.PushBool((bool)value);
             }
             else if (type == typeof(short))
             {
-                this.PushByte(GnTypes.Short);
+                this.PushByte(Types.Short);
                 this.PushShort((short)value);
             }
             else if (type == typeof(int))
             {
-                this.PushByte(GnTypes.Int);
+                this.PushByte(Types.Int);
                 this.PushInt((int)value);
             }
             else if (type == typeof(long))
             {
-                this.PushByte(GnTypes.Long);
+                this.PushByte(Types.Long);
                 this.PushLong((long)value);
             }
             else if (type == typeof(string))
             {
-                this.PushByte(GnTypes.String);
+                this.PushByte(Types.String);
                 this.PushString(value.ToString());
             }
             else if (type == typeof(float))
             {
-                this.PushByte(GnTypes.Float);
+                this.PushByte(Types.Float);
                 this.PushFloat((float)value);
             }
             else if (value is Array)
             {
                 if (type == typeof(int[]))
                 {
-                    this.PushByte(GnTypes.Ints);
+                    this.PushByte(Types.Ints);
                     this.PushInts(value as int[]);
                 }
                 else
                 {
-                    this.PushByte(GnTypes.Array);
+                    this.PushByte(Types.Array);
                     this.PushArray(value as Array);
                 }
             }
             else if (value is Dictionary<object, object>)
             {
-                this.PushByte(GnTypes.Hash);
+                this.PushByte(Types.Hash);
                 this.PushHash(value as Dictionary<object, object>);
             }
             else if (value is Dictionary<int, int>)
             {
-                this.PushByte(GnTypes.Hash);
+                this.PushByte(Types.Hash);
                 this.PushHash(value as Dictionary<int, int>);
             }
             else
@@ -184,9 +184,9 @@ namespace itfantasy.gun.gnbuffers
                 {
                     CustomType custom = customTypeExtends[type];
                     this.PushByte(custom.bSign);
-                    if (custom.gnSerializeFunc != null)
+                    if (custom.binSerializeFunc != null)
                     {
-                        custom.gnSerializeFunc(this, value);
+                        custom.binSerializeFunc(this, value);
                     }
                     else
                     {
@@ -198,7 +198,7 @@ namespace itfantasy.gun.gnbuffers
                 }
                 else
                 {
-                    this.PushByte(GnTypes.Native);
+                    this.PushByte(Types.Native);
                     this.PushNative(value);
                 }
             }
@@ -219,7 +219,7 @@ namespace itfantasy.gun.gnbuffers
             return true;
         }
 
-        public static bool ExtendCustomType(Type type, byte bSign, GnSerializeFunc func)
+        public static bool ExtendCustomType(Type type, byte bSign, BinSerializeFunc func)
         {
             customTypeExtends[type] = new CustomType(type, bSign, func, null);
             return true;

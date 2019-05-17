@@ -26,7 +26,7 @@ namespace itfantasy.gun.nets.tcp
             tcpsocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             tcpsocket.BeginConnect(infos[0], int.Parse(infos[1]), (ar) => {
                 this.tcpsocket.EndConnect(ar);
-                this.doHandShake("localhost#cnt");
+                this.doHandShake("");
                 this.eventListener.OnConn();
                 this.rcvbuf = new byte[4096];
                 this.tcpsocket.BeginReceive(rcvbuf, 0, rcvbuf.Length, 0, (ar2) => {

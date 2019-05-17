@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace itfantasy.gun.gnbuffers
+namespace itfantasy.gun.core.binbuf
 {
     public class NativeFormatter
     {
