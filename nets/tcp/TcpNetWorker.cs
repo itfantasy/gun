@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using itfantasy.gun.core.binbuf;
 using itfantasy.gun.nets;
 using itfantasy.lmjson;
 
@@ -11,12 +12,11 @@ namespace itfantasy.gun.nets.tcp
     public class TcpNetWorker : INetWorker
     {
         Socket tcpsocket;
-        byte[] rcvbuf;
+        TcpBuffer rcvbuf;
 
         INetEventListener eventListener;
 
         Queue<byte[]> msgQueue = new Queue<byte[]>();
-
 
         public void Connect(string url)
         {
@@ -28,17 +28,54 @@ namespace itfantasy.gun.nets.tcp
                 this.tcpsocket.EndConnect(ar);
                 this.doHandShake("");
                 this.eventListener.OnConn();
-                this.rcvbuf = new byte[4096];
-                this.tcpsocket.BeginReceive(rcvbuf, 0, rcvbuf.Length, 0, (ar2) => {
-                    int n = this.tcpsocket.EndReceive(ar2);
-                    byte[] tmpbuf = new byte[n];
-                    Buffer.BlockCopy(rcvbuf, 0, tmpbuf, 0, n);
-                    lock (this.msgQueue)
-                    {
-                        this.msgQueue.Enqueue(tmpbuf);
-                    }
-                }, null);
+                this.rcvbuf = new TcpBuffer(new byte[8192]);
+                this.PostReceive();
             }, null);
+        }
+
+        private void PostReceive()
+        {
+            this.tcpsocket.BeginReceive(this.rcvbuf.buf, 0, this.rcvbuf.capcity, 0, ReceiveCallback, null);
+        }
+
+        private void ReceiveCallback(IAsyncResult ar)
+        {
+            try
+            {
+                int n = this.tcpsocket.EndReceive(ar);
+                if (n > 0)
+                {
+                    this.rcvbuf.AddDataLen(n);
+                    while (this.rcvbuf.count > TcpBuffer.PCK_MIN_SIZE)
+                    {
+                        BinParser parser = new BinParser(this.rcvbuf.buf, this.rcvbuf.offet);
+                        int head = parser.Int();
+                        if (head != TcpBuffer.PCK_HEADER)
+                        {
+                            this.rcvbuf.Clear();
+                            break;
+                        }
+                        int length = (int)parser.Short();
+                        if (length > this.rcvbuf.count)
+                        {
+                            break;
+                        }
+                        byte[] tmpbuf = new byte[length];
+                        Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offet + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
+                        lock (this.msgQueue)
+                        {
+                            this.msgQueue.Enqueue(tmpbuf);
+                        }
+                        this.rcvbuf.DeleteData(length);
+                    }
+                    this.rcvbuf.Reset();
+                }
+                this.PostReceive();
+            }
+            catch(Exception e)
+            {
+                this.eventListener.OnError(errors.New(e.Message));
+            }
         }
 
         public bool Update()
@@ -58,21 +95,50 @@ namespace itfantasy.gun.nets.tcp
 
         public error Send(byte[] msg)
         {
-            int n = this.tcpsocket.Send(msg);
-            if (n <= 0)
+            int length = msg.Length;
+            BinBuffer buf = new BinBuffer(length + TcpBuffer.PCK_MIN_SIZE);
+            buf.PushInt(TcpBuffer.PCK_HEADER);
+            buf.PushShort((short)length);
+            buf.PushBytes(msg);
+
+            try
             {
-                return errors.New("there's no datas have been sended!");
+                int n = this.tcpsocket.Send(buf.Bytes());
+                if (n <= 0)
+                {
+                    return errors.New("there's no datas have been sended!");
+                }
+                return errors.nil;
             }
-            return errors.nil;
+            catch(Exception e)
+            {
+                error err = errors.New(e.Message);
+                this.eventListener.OnError(err);
+                return err;
+            }
         }
 
         public error SendAsync(byte[] msg, Action<bool> callback = null)
         {
-            this.tcpsocket.BeginSend(msg, 0, msg.Length, 0, (ar) => {
+            int length = msg.Length;
+            BinBuffer buf = new BinBuffer(length + TcpBuffer.PCK_MIN_SIZE);
+            buf.PushInt(TcpBuffer.PCK_HEADER);
+            buf.PushShort((short)length);
+            buf.PushBytes(msg);
+
+            this.tcpsocket.BeginSend(buf.Bytes(), 0, msg.Length, 0, (ar) =>
+            {
                 if (callback != null)
                 {
-                    int n = this.tcpsocket.EndSend(ar);
-                    callback.Invoke(n > 0);
+                    try
+                    {
+                        int n = this.tcpsocket.EndSend(ar);
+                        callback.Invoke(n > 0);
+                    }
+                    catch (Exception e)
+                    {
+                        this.eventListener.OnError(errors.New(e.Message));
+                    }
                 }
             }, null);
             return errors.nil;

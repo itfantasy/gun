@@ -21,6 +21,12 @@ namespace itfantasy.gun.core.binbuf
             this.buffer[this.offset++] = value;
         }
 
+        public void PushBytes(byte[] value)
+        {
+            Buffer.BlockCopy(value, 0, this.buffer, this.offset, value.Length);
+            this.offset += value.Length;
+        }
+
         public void PushBool(bool value)
         {
             byte[] buffer = BitConverter.GetBytes(value);

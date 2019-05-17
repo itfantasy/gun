@@ -128,6 +128,7 @@
     <Compile Include="nets\INetEventListener.cs" />
     <Compile Include="nets\INetWorker.cs" />
     <Compile Include="nets\kcp\KcpNetWorker.cs" />
+    <Compile Include="nets\tcp\TcpBuffer.cs" />
     <Compile Include="nets\tcp\TcpNetWorker.cs" />
     <Compile Include="nets\ws\WSNetWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
