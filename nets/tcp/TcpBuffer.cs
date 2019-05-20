@@ -7,8 +7,8 @@ namespace itfantasy.gun.nets.tcp
 {
     class TcpBuffer
     {
-        public const int PCK_MIN_SIZE  = 6; // |--- header 0xAA5555AA 4bytes ---|--- length 2 bytes ---|--- other datas --- ....
-	    public const int PCK_HEADER  = 0x676f21; // go!
+        public const int PCK_MIN_SIZE  = 6; // |--- header 4bytes ---|--- length 2 bytes ---|--- other datas --- ....
+        public const int PCK_HEADER = 0x2123676f; // !#go
 
         int _count;
         int _offset;

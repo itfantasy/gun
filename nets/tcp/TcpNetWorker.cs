@@ -33,6 +33,21 @@ namespace itfantasy.gun.nets.tcp
             }, null);
         }
 
+        public bool Update()
+        {
+            if (this.msgQueue.Count > 0)
+            {
+                byte[] e;
+                lock (this.msgQueue)
+                {
+                    e = this.msgQueue.Dequeue();
+                }
+                this.eventListener.OnMsg(e);
+                return true;
+            }
+            return false;
+        }
+
         private void PostReceive()
         {
             this.tcpsocket.BeginReceive(this.rcvbuf.buf, 0, this.rcvbuf.capcity, 0, ReceiveCallback, null);
@@ -62,35 +77,34 @@ namespace itfantasy.gun.nets.tcp
                         }
                         byte[] tmpbuf = new byte[length];
                         Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offet + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
-                        lock (this.msgQueue)
-                        {
-                            this.msgQueue.Enqueue(tmpbuf);
-                        }
                         this.rcvbuf.DeleteData(length);
+                        this.OnReceive(tmpbuf);
                     }
                     this.rcvbuf.Reset();
                 }
                 this.PostReceive();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.eventListener.OnError(errors.New(e.Message));
             }
         }
 
-        public bool Update()
+        private void OnReceive(byte[] buf)
         {
-            if (this.msgQueue.Count > 0)
+            if (buf[0] == 35)
             {
-                byte[] e;
-                lock (this.msgQueue)
+                string str = System.Text.Encoding.UTF8.GetString(buf);
+                if (str == "#ping")
                 {
-                    e = this.msgQueue.Dequeue();
+                    SendAsync(System.Text.Encoding.UTF8.GetBytes("#pong")); // return the pong pck to server
+                    return;
                 }
-                this.eventListener.OnMsg(e);
-                return true;
             }
-            return false;
+            lock (this.msgQueue)
+            {
+                this.msgQueue.Enqueue(buf);
+            }
         }
 
         public error Send(byte[] msg)
