@@ -22,6 +22,7 @@ namespace itfantasy.gun.nets.kcp
     {
         Kcp.UdpSocket kcpsocket;
         INetEventListener eventListener;
+        AutoPing ping;
 
         Queue<byte[]> msgQueue = new Queue<byte[]>();
 
@@ -35,6 +36,10 @@ namespace itfantasy.gun.nets.kcp
             if (Connected)
             {
                 this.kcpsocket.Update();
+                if (this.ping != null)
+                {
+                    this.ping.Update();
+                }
             }
             if (this.msgQueue.Count > 0)
             {
@@ -87,14 +92,20 @@ namespace itfantasy.gun.nets.kcp
 #else // KCP_v2
             this.eventListener.OnConn();
 #endif
+            this.ping = new AutoPing(this, this.eventListener);
         }
 
         private void OnReceive(byte[] buf)
         {
+            this.ping.ResetConnState();
             if (buf[0] == 35)
             {
                 string str = System.Text.Encoding.UTF8.GetString(buf);
-                if (str == "#ping")
+                if (str == "#pong")
+                {
+                    return; // nothing to do but ResetConnState for AutoPing
+                }
+                else if (str == "#ping")
                 {
                     SendAsync(System.Text.Encoding.UTF8.GetBytes("#pong")); // return the pong pck to server
                     return;
@@ -138,6 +149,7 @@ namespace itfantasy.gun.nets.kcp
             this.kcpsocket.Close();
             this.kcpsocket = null;
             this.msgQueue.Clear();
+            this.ping = null;
         }
 
         private void doHandShake(string origin)

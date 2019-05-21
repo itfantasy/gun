@@ -13,6 +13,7 @@ namespace itfantasy.gun.nets.tcp
     {
         Socket tcpsocket;
         TcpBuffer rcvbuf;
+        AutoPing ping;
 
         INetEventListener eventListener;
 
@@ -30,11 +31,19 @@ namespace itfantasy.gun.nets.tcp
                 this.eventListener.OnConn();
                 this.rcvbuf = new TcpBuffer(new byte[8192]);
                 this.PostReceive();
+                this.ping = new AutoPing(this, this.eventListener);
             }, null);
         }
 
         public bool Update()
         {
+            if (Connected)
+            {
+                if (this.ping != null)
+                {
+                    this.ping.Update();
+                }
+            }
             if (this.msgQueue.Count > 0)
             {
                 byte[] e;
@@ -58,12 +67,13 @@ namespace itfantasy.gun.nets.tcp
             try
             {
                 int n = this.tcpsocket.EndReceive(ar);
+                this.ping.ResetConnState();
                 if (n > 0)
                 {
                     this.rcvbuf.AddDataLen(n);
                     while (this.rcvbuf.count > TcpBuffer.PCK_MIN_SIZE)
                     {
-                        BinParser parser = new BinParser(this.rcvbuf.buf, this.rcvbuf.offet);
+                        BinParser parser = new BinParser(this.rcvbuf.buf, this.rcvbuf.offset);
                         int head = parser.Int();
                         if (head != TcpBuffer.PCK_HEADER)
                         {
@@ -76,13 +86,18 @@ namespace itfantasy.gun.nets.tcp
                             break;
                         }
                         byte[] tmpbuf = new byte[length];
-                        Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offet + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
-                        this.rcvbuf.DeleteData(length);
-                        this.OnReceive(tmpbuf);
+                        Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offset + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
+                        this.rcvbuf.DeleteData(length + TcpBuffer.PCK_MIN_SIZE);
+                        this.OnReceive(tmpbuf); // just put in a msg queue, not whole logic!
                     }
                     this.rcvbuf.Reset();
+                    this.PostReceive(); // the reason why you need a msg queue!
                 }
-                this.PostReceive();
+                else
+                {
+                    this.eventListener.OnError(errors.New("empty data!!"));
+                    this.Close();
+                }
             }
             catch (Exception e)
             {
@@ -95,7 +110,11 @@ namespace itfantasy.gun.nets.tcp
             if (buf[0] == 35)
             {
                 string str = System.Text.Encoding.UTF8.GetString(buf);
-                if (str == "#ping")
+                if (str == "#pong")
+                {
+                    return; // nothing to do but ResetConnState for AutoPing
+                }
+                else if (str == "#ping")
                 {
                     SendAsync(System.Text.Encoding.UTF8.GetBytes("#pong")); // return the pong pck to server
                     return;
@@ -140,7 +159,9 @@ namespace itfantasy.gun.nets.tcp
             buf.PushShort((short)length);
             buf.PushBytes(msg);
 
-            this.tcpsocket.BeginSend(buf.Bytes(), 0, msg.Length, 0, (ar) =>
+            Console.WriteLine(buf.Bytes());
+
+            this.tcpsocket.BeginSend(buf.Bytes(), 0, buf.Bytes().Length, 0, (ar) =>
             {
                 if (callback != null)
                 {
@@ -172,8 +193,10 @@ namespace itfantasy.gun.nets.tcp
         {
             this.tcpsocket.Close();
             this.tcpsocket = null;
+            this.rcvbuf.Dispose();
             this.rcvbuf = null;
             this.msgQueue.Clear();
+            this.ping = null;
         }
 
         private void doHandShake(string origin)

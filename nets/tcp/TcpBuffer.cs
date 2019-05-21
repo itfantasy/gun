@@ -5,7 +5,7 @@ using System.Text;
 
 namespace itfantasy.gun.nets.tcp
 {
-    class TcpBuffer
+    class TcpBuffer : IDisposable
     {
         public const int PCK_MIN_SIZE  = 6; // |--- header 4bytes ---|--- length 2 bytes ---|--- other datas --- ....
         public const int PCK_HEADER = 0x2123676f; // !#go
@@ -50,7 +50,7 @@ namespace itfantasy.gun.nets.tcp
             }
         }
 
-        public int offet
+        public int offset
         {
             get
             {
@@ -91,5 +91,9 @@ namespace itfantasy.gun.nets.tcp
             }
 	    }
         
+        public void Dispose()
+        {
+            this._buffer = null;
+        }
     }
 }
