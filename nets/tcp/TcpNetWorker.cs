@@ -159,8 +159,6 @@ namespace itfantasy.gun.nets.tcp
             buf.PushShort((short)length);
             buf.PushBytes(msg);
 
-            Console.WriteLine(buf.Bytes());
-
             this.tcpsocket.BeginSend(buf.Bytes(), 0, buf.Bytes().Length, 0, (ar) =>
             {
                 if (callback != null)
