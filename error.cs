@@ -8,6 +8,7 @@ namespace itfantasy.gun
     public class error
     {
         private string text;
+        public int errcode { get; set; }
 
         public bool nil
         {
@@ -22,6 +23,14 @@ namespace itfantasy.gun
         public error(string text)
         {
             this.text = text;
+            if(this.text == String.Empty)
+            {
+                errcode = 0;
+            }
+            else
+            {
+                errcode = 1;
+            }
         }
 
         public string Error()

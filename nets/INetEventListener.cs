@@ -7,9 +7,9 @@ namespace itfantasy.gun.nets
 {
     public interface INetEventListener
     {
-        void OnConn();                       // 获得新链接时
-	    void OnMsg(byte[] msg);            // 有新消息时
-	    void OnClose();                      // 链接断开时
-	    void OnError(error err);           // 链接异常时
+        void OnConn();
+	    void OnMsg(byte[] msg);
+	    void OnClose(error reason);
+	    void OnError(error err);
     }
 }

@@ -21,12 +21,22 @@ namespace itfantasy.gun.nets.tcp
 
         public void Connect(string url)
         {
+            this.Dispose();
+
             string urlInfo = url.TrimStart(("tcp://").ToCharArray());
             string[] infos = urlInfo.Split(':');
 
             tcpsocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             tcpsocket.BeginConnect(infos[0], int.Parse(infos[1]), (ar) => {
-                this.tcpsocket.EndConnect(ar);
+                try
+                {
+                    this.tcpsocket.EndConnect(ar);
+                }
+                catch(Exception e)
+                {
+                    this.OnError(errors.New(e.Message));
+                    return;
+                }
                 this.doHandShake("");
                 this.eventListener.OnConn();
                 this.rcvbuf = new TcpBuffer(new byte[8192]);
@@ -95,13 +105,13 @@ namespace itfantasy.gun.nets.tcp
                 }
                 else
                 {
-                    this.eventListener.OnError(errors.New("empty data!!"));
+                    this.OnError(errors.New("empty data!!"));
                     this.Close();
                 }
             }
             catch (Exception e)
             {
-                this.eventListener.OnError(errors.New(e.Message));
+                this.OnError(errors.New(e.Message));
             }
         }
 
@@ -126,6 +136,13 @@ namespace itfantasy.gun.nets.tcp
             }
         }
 
+        private void OnError(error err)
+        {
+            this.eventListener.OnError(err);
+            this.eventListener.OnClose(err);
+            this.Dispose();
+        }
+
         public error Send(byte[] msg)
         {
             int length = msg.Length;
@@ -146,7 +163,7 @@ namespace itfantasy.gun.nets.tcp
             catch(Exception e)
             {
                 error err = errors.New(e.Message);
-                this.eventListener.OnError(err);
+                this.OnError(err);
                 return err;
             }
         }
@@ -170,7 +187,7 @@ namespace itfantasy.gun.nets.tcp
                     }
                     catch (Exception e)
                     {
-                        this.eventListener.OnError(errors.New(e.Message));
+                        this.OnError(errors.New(e.Message));
                     }
                 }
             }, null);
@@ -189,12 +206,21 @@ namespace itfantasy.gun.nets.tcp
 
         public void Close()
         {
-            this.tcpsocket.Close();
-            this.tcpsocket = null;
-            this.rcvbuf.Dispose();
-            this.rcvbuf = null;
-            this.msgQueue.Clear();
-            this.ping = null;
+            this.eventListener.OnClose(errors.nil);
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (this.tcpsocket != null)
+            {
+                this.tcpsocket.Close();
+                this.tcpsocket = null;
+                this.rcvbuf.Dispose();
+                this.rcvbuf = null;
+                this.msgQueue.Clear();
+                this.ping = null;
+            }
         }
 
         private void doHandShake(string origin)

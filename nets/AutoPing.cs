@@ -34,10 +34,10 @@ namespace itfantasy.gun.nets
                     if (this.state.ping)
                     {
                         // conn time out
-                        this.state.listener.OnError(
-                            errors.New("conn time out!")
-                        );
-                        this.state.worker.Close();
+                        error err = errors.New("conn time out!");
+                        this.state.listener.OnError(err);
+                        this.state.listener.OnClose(err);
+                        this.state.worker.Dispose();
                     }
                     else if (tick - this.state.ts > 20000000)
                     {

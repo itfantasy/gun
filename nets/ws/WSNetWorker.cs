@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿#if !UNITY_EDITOR
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ namespace itfantasy.gun.nets.ws
         public void Connect(string url)
         {
             this.websocket = new WebSocket(url);
-            this.websocket.Origin = "ws://127.0.0.1/cnt#cnt";
+            this.websocket.Origin = "";
             this.websocket.OnOpen += websocket_OnConnect;
             this.websocket.OnMessage += websocket_OnMessage;
             this.websocket.OnClose += websocket_OnClose;
@@ -79,13 +79,22 @@ namespace itfantasy.gun.nets.ws
 
         public void Close()
         {
-            this.websocket.Close();
-            this.msgQueue.Clear();
-            this.websocket.OnOpen -= websocket_OnConnect;
-            this.websocket.OnMessage -= websocket_OnMessage;
-            this.websocket.OnClose -= websocket_OnClose;
-            this.websocket.OnError -= websocket_OnError;
-            this.websocket = null;
+            this.eventListener.OnClose(errors.nil);
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (this.websocket != null)
+            {
+                this.websocket.Close();
+                this.msgQueue.Clear();
+                this.websocket.OnOpen -= websocket_OnConnect;
+                this.websocket.OnMessage -= websocket_OnMessage;
+                this.websocket.OnClose -= websocket_OnClose;
+                this.websocket.OnError -= websocket_OnError;
+                this.websocket = null;
+            }
         }
 
         private void websocket_OnConnect(object sender, object e)
@@ -103,7 +112,8 @@ namespace itfantasy.gun.nets.ws
 
         private void websocket_OnClose(object sender, CloseEventArgs e)
         {
-            this.eventListener.OnClose();
+            this.eventListener.OnClose(errors.New(e.Reason));
+            this.Dispose();
         }
 
         private void websocket_OnError(object sender, ErrorEventArgs e)

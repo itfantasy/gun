@@ -56,6 +56,8 @@ namespace itfantasy.gun.nets.kcp
 
         public void Connect(string url)
         {
+            this.Dispose();
+
             string urlInfo = url.TrimStart(("kcp://").ToCharArray());
             string[] infos = urlInfo.Split(':');
 
@@ -68,11 +70,10 @@ namespace itfantasy.gun.nets.kcp
                         this.eventListener.OnConn();
                         break;
                     case KcpProject.v1.UdpSocket.cliEvent.ConnectFailed:
-                        this.eventListener.OnError(errors.New(err));
+                        this.OnError(errors.New(err));
                         break;
                     case KcpProject.v1.UdpSocket.cliEvent.Disconnect:
-                        this.eventListener.OnError(errors.New(err));
-                        this.eventListener.OnClose();
+                        this.OnError(errors.New(err));
                         break;
                     case KcpProject.v1.UdpSocket.cliEvent.RcvMsg:
                         this.OnReceive(buf);
@@ -83,7 +84,7 @@ namespace itfantasy.gun.nets.kcp
             this.kcpsocket = new KcpProject.v2.UdpSocket((byte[] buf) =>  {
                 this.OnReceive(buf);
             },(err) => {
-                this.eventListener.OnError(errors.New(err));
+                this.OnError(errors.New(err));
             });
 #endif
             this.kcpsocket.Connect(infos[0], ushort.Parse(infos[1]));
@@ -117,6 +118,13 @@ namespace itfantasy.gun.nets.kcp
             }
         }
 
+        private void OnError(error err)
+        {
+            this.eventListener.OnError(err);
+            this.eventListener.OnClose(err);
+            this.Dispose();
+        }
+
         public error Send(byte[] msg)
         {
             this.kcpsocket.Send(msg);
@@ -145,11 +153,19 @@ namespace itfantasy.gun.nets.kcp
 
         public void Close()
         {
-            this.eventListener.OnClose();
-            this.kcpsocket.Close();
-            this.kcpsocket = null;
-            this.msgQueue.Clear();
-            this.ping = null;
+            this.eventListener.OnClose(errors.nil);
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (this.kcpsocket != null)
+            {
+                this.kcpsocket.Close();
+                this.kcpsocket = null;
+                this.msgQueue.Clear();
+                this.ping = null;
+            }
         }
 
         private void doHandShake(string origin)

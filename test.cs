@@ -55,7 +55,7 @@ namespace itfantasy.gun
             Console.WriteLine(par.String());
         }
 
-        public void OnClose()
+        public void OnClose(error reason)
         {
 
         }
