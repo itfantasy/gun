@@ -19,9 +19,12 @@ namespace itfantasy.gun.nets.tcp
 
         Queue<byte[]> msgQueue = new Queue<byte[]>();
 
+        bool closing = false;
+
         public void Connect(string url)
         {
             this.Dispose();
+            this.closing = false;
 
             string urlInfo = url.TrimStart(("tcp://").ToCharArray());
             string[] infos = urlInfo.Split(':');
@@ -69,44 +72,50 @@ namespace itfantasy.gun.nets.tcp
 
         private void PostReceive()
         {
-            this.tcpsocket.BeginReceive(this.rcvbuf.buf, 0, this.rcvbuf.capcity, 0, ReceiveCallback, null);
+            if (!this.closing)
+            {
+                this.tcpsocket.BeginReceive(this.rcvbuf.buf, 0, this.rcvbuf.capcity, 0, ReceiveCallback, null);
+            }
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
             try
             {
-                int n = this.tcpsocket.EndReceive(ar);
-                this.ping.ResetConnState();
-                if (n > 0)
+                if (!this.closing)
                 {
-                    this.rcvbuf.AddDataLen(n);
-                    while (this.rcvbuf.count > TcpBuffer.PCK_MIN_SIZE)
+                    int n = this.tcpsocket.EndReceive(ar);
+                    this.ping.ResetConnState();
+                    if (n > 0)
                     {
-                        BinParser parser = new BinParser(this.rcvbuf.buf, this.rcvbuf.offset);
-                        int head = parser.Int();
-                        if (head != TcpBuffer.PCK_HEADER)
+                        this.rcvbuf.AddDataLen(n);
+                        while (this.rcvbuf.count > TcpBuffer.PCK_MIN_SIZE)
                         {
-                            this.rcvbuf.Clear();
-                            break;
+                            BinParser parser = new BinParser(this.rcvbuf.buf, this.rcvbuf.offset);
+                            int head = parser.Int();
+                            if (head != TcpBuffer.PCK_HEADER)
+                            {
+                                this.rcvbuf.Clear();
+                                break;
+                            }
+                            int length = (int)parser.Short();
+                            if (length > this.rcvbuf.count)
+                            {
+                                break;
+                            }
+                            byte[] tmpbuf = new byte[length];
+                            Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offset + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
+                            this.rcvbuf.DeleteData(length + TcpBuffer.PCK_MIN_SIZE);
+                            this.OnReceive(tmpbuf); // just put in a msg queue, not whole logic!
                         }
-                        int length = (int)parser.Short();
-                        if (length > this.rcvbuf.count)
-                        {
-                            break;
-                        }
-                        byte[] tmpbuf = new byte[length];
-                        Buffer.BlockCopy(this.rcvbuf.buf, this.rcvbuf.offset + TcpBuffer.PCK_MIN_SIZE, tmpbuf, 0, length);
-                        this.rcvbuf.DeleteData(length + TcpBuffer.PCK_MIN_SIZE);
-                        this.OnReceive(tmpbuf); // just put in a msg queue, not whole logic!
+                        this.rcvbuf.Reset();
+                        this.PostReceive(); // the reason why you need a msg queue!
                     }
-                    this.rcvbuf.Reset();
-                    this.PostReceive(); // the reason why you need a msg queue!
-                }
-                else
-                {
-                    this.OnError(errors.New("empty data!!"));
-                    this.Close();
+                    else
+                    {
+                        this.OnError(errors.New("empty data!!"));
+                        this.Close();
+                    }
                 }
             }
             catch (Exception e)
@@ -206,6 +215,7 @@ namespace itfantasy.gun.nets.tcp
 
         public void Close()
         {
+            this.closing = true;
             this.eventListener.OnClose(errors.nil);
             this.Dispose();
         }
